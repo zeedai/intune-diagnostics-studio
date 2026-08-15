@@ -1,82 +1,216 @@
 # Intune Diagnostics Studio
 
-A lightweight local log reader for common Microsoft Intune, Entra ID, MDM and Intune Management Extension issues.
+A small tool I put together to make Intune troubleshooting a bit easier.
 
-I built this because I wanted a quicker way to look through the logs I normally collect when troubleshooting Intune and Hybrid Entra Join devices. Instead of opening several log files and Event Viewer exports separately, I can drop them into one page and get the main errors, evidence and checks in one place.
+A lot of Intune, Hybrid Entra Join and MDM issues involve checking the same logs in different places, so I wanted one place where I could load the logs, spot the useful errors and quickly see what I should check next.
+
+The analyser runs locally in your browser. It does not upload your logs anywhere.
 
 ## What it does
 
-- Reads `.log`, `.txt`, `.csv`, `.json` and `.xml` files
-- Works in a browser on Windows, macOS and Linux
-- Runs locally, so the log files are not uploaded anywhere
-- Picks up common Intune, IME, MDM and Entra ID errors
-- Shows Critical, Warning, Info and OK findings
-- Pulls basic device join and enrollment details when they are present in the logs
-- Lets you search and filter the findings
-- Exports the results as an HTML report
-- Includes PowerShell scripts to collect useful Windows-side logs
+It can read and analyse:
 
-## Quick start
+- Intune Management Extension logs
+- MDM Event Viewer exports
+- Entra ID / Device Registration logs
+- `dsregcmd /status`
+- Windows device information
+- network and DNS checks
+- MDM certificate information
+- Windows Update related logs
+- Autopilot related logs
+- SCCM / co-management related logs
 
-1. Download `index.html`.
-2. Open it in Chrome, Edge, Firefox or Safari.
-3. Drop your Intune or Entra log files into the page.
+Findings are grouped as:
+
+- Critical
+- Warning
+- Information
+- Healthy
+
+It also shows the evidence from the logs and some checks to work through.
+
+## Supported platforms
+
+The log reader works on:
+
+- Windows
+- macOS
+- Linux
+
+You just need a modern browser.
+
+The collection scripts need to be run on Windows because they use Windows-specific tools such as PowerShell, Event Viewer, `dsregcmd` and the Intune Management Extension logs.
+
+## How to collect the logs
+
+### Full Intune / Hybrid Entra Join collection
+
+Copy this script to the Windows device you are troubleshooting:
+
+```text
+scripts/Collect-HybridEntraLogs.ps1
+```
+
+Open **PowerShell as Administrator** and run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass -Force
+.\Collect-HybridEntraLogs.ps1
+```
+
+If the script is still blocked, use:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\Collect-HybridEntraLogs.ps1
+```
+
+The script collects useful information including:
+
+- `dsregcmd /status`
+- Intune Management Extension logs
+- MDM diagnostics
+- Intune / MDM Event Viewer logs
+- Entra ID / Device Registration events
+- Group Policy results
+- device information
+- network and DNS checks
+- MDM certificates
+- Hybrid Join related information
+
+When it finishes, it creates:
+
+```text
+C:\temp\sendme.zip
+```
+
+Copy that ZIP back to your troubleshooting machine.
+
+### Event Viewer logs only
+
+If you only need the Intune / MDM Event Viewer logs, use:
+
+```text
+scripts/Export-IntuneEventLogs.ps1
+```
+
+Run it from an elevated PowerShell window:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass -Force
+.\Export-IntuneEventLogs.ps1
+```
+
+The script exports the useful Event Viewer entries into a format that Intune Diagnostics Studio can read.
+
+The main areas covered include:
+
+- DeviceManagement-Enterprise-Diagnostics-Provider
+- User Device Registration
+- Entra ID / AAD
+- MDM enrolment
+- Autopilot
+- Windows Update
+- Application
+- System
+
+## How to analyse the logs
+
+1. Open `index.html` in Chrome, Edge, Firefox or Safari.
+2. Extract `sendme.zip`.
+3. Drag the relevant log files into Intune Diagnostics Studio.
 4. Click **Analyse logs**.
-5. Check the finding, evidence and **What to check** section before making any change.
+5. Review the findings, evidence and suggested checks.
 
-No install is needed for the reader itself.
+Supported file types currently include:
 
-## Windows log collection
+```text
+.log
+.txt
+.csv
+.json
+.xml
+```
 
-The analyser is cross-platform, but the collection scripts are Windows-only because they use Windows components such as `dsregcmd`, Event Viewer and the Intune Management Extension.
+## Examples of checks
 
-The `scripts` folder contains:
+The current checks include things such as:
 
-- `Collect-HybridEntraLogs.ps1` for a wider Intune / Hybrid Entra Join collection
-- `Export-IntuneEventLogs.ps1` for exporting useful Intune and MDM Event Viewer entries
+- Intune network / web exceptions
+- IME errors
+- Win32 app installation failures
+- remediation script failures
+- assignment / filter exclusions
+- MDM enrolment failures
+- stale MDM enrolment
+- Hybrid Join issues
+- Device Registration failures
+- successful MDM enrolment
+- MDM certificate information
+- Windows Update related issues
 
-A normal workflow is:
+It also checks for useful Event Viewer IDs including:
 
-1. Run the collector on the affected Windows device.
-2. Copy the collected logs to the machine you want to troubleshoot from.
-3. Open `index.html` on Windows, macOS or Linux.
-4. Drop the files into the reader.
+```text
+76
+78
+102
+404
+8202
+8204
+8211
+8300
+```
 
-## Current checks
+## Privacy
 
-The rules currently cover areas such as:
+Everything in the analyser runs locally in the browser.
 
-- Intune service/network failures
-- Intune Management Extension errors
-- Health Script / Remediation retrieval failures
-- Win32 app install failures
-- assignment and filter exclusions
-- MDM enrollment failures
-- MDM policy apply/retrieval failures
-- auto-enrollment failures
-- enrollment nonce failures
-- stale or deleted MDM enrollment references
-- useful successful enrollment and communication events
+The tool does not upload logs anywhere.
 
-## Important
+I would still check logs before sharing them publicly because they can contain things such as:
 
-This tool is there to make log review quicker. It does not replace checking the actual evidence, Microsoft documentation, tenant configuration or the device itself.
+- usernames
+- tenant names
+- device IDs
+- email addresses
+- certificates
+- customer names
+- internal server names
+- IP addresses
 
-Some errors can have more than one cause, so I would not run a fix purely because the reader suggests it.
+## What I want to add next
 
-## Roadmap
-
-Things I want to add next:
+A few things I still want to improve:
 
 - direct `sendme.zip` support
-- better Hybrid Entra Join health checks
-- a simple AD Join → Entra Join → Device Auth → PRT → MDM → IME status chain
-- more enrollment and Intune error codes
-- Autopilot checks
-- Windows Update checks
+- better Hybrid Entra Join diagnosis
+- better Event Viewer timeline
+- Autopilot troubleshooting
 - SCCM / co-management checks
-- better report export
+- Windows Update checks
+- more Intune and MDM error codes
+- clearer device health summary
+- exportable troubleshooting reports
 
-## Author
+The aim is to make the first pass on a problem device quicker instead of opening a load of different logs one by one.
 
-Zahin Memon
+## Project files
+
+```text
+intune-diagnostics-studio/
+├── index.html
+├── README.md
+├── LICENSE
+├── .gitignore
+├── GITHUB.md
+└── scripts/
+    ├── Collect-HybridEntraLogs.ps1
+    └── Export-IntuneEventLogs.ps1
+```
+
+## Disclaimer
+
+This is a troubleshooting tool I built for my own use and learning.
+
+Always check the actual logs and understand the environment before making changes to production devices.
