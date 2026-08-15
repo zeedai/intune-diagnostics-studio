@@ -1,0 +1,532 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Intune Diagnostics Studio</title><style>
+:root{--bg:#f4f7fb;--panel:#fff;--panel2:#f8fafc;--text:#142033;--muted:#667085;--border:#e5eaf1;--blue:#2563eb;--blue2:#eaf2ff;--red:#e5484d;--redbg:#fff0f0;--amber:#e99a18;--amberbg:#fff8e8;--green:#20a36b;--greenbg:#ecfbf4;--shadow:0 10px 35px rgba(16,24,40,.07)}
+html.dark{--bg:#0c111b;--panel:#141b27;--panel2:#101722;--text:#e8edf5;--muted:#9aa7ba;--border:#263246;--blue2:#17284b;--redbg:#321b20;--amberbg:#332718;--greenbg:#173026;--shadow:0 12px 35px rgba(0,0,0,.25)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px}.shell{max-width:1180px;margin:0 auto;padding:26px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#2563eb,#6d5dfc);display:grid;place-items:center;color:white;font-size:22px;box-shadow:var(--shadow)}h1{font-size:21px;margin:0}.sub{margin:4px 0 0;color:var(--muted);font-size:12.5px}.theme{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer}.hero{display:grid;grid-template-columns:1.45fr .75fr;gap:18px;margin-bottom:18px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow)}#drop{padding:38px 24px;text-align:center;border:2px dashed #b9c6d8;border-radius:18px;cursor:pointer;transition:.2s;background:linear-gradient(180deg,var(--panel),var(--panel2))}#drop.drag{border-color:var(--blue);background:var(--blue2);transform:translateY(-1px)}.drop-icon{width:58px;height:58px;margin:0 auto 14px;border-radius:18px;background:var(--blue2);color:var(--blue);display:grid;place-items:center;font-size:28px}#drop p{font-size:16px;font-weight:700;margin:0 0 6px}#drop small{color:var(--muted)}.privacy{padding:22px}.privacy h3{margin:0 0 8px;font-size:14px}.privacy p{color:var(--muted);line-height:1.55;margin:0 0 16px}.privacy-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--border);font-size:12px}.tick{color:var(--green);font-weight:700}.load-panel{padding:16px 18px;margin-bottom:18px}.load-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.status{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;padding:9px 14px;border-radius:10px;font-weight:650;cursor:pointer}.btn-blue{background:var(--blue);color:#fff}.btn-blue:disabled{opacity:.45;cursor:not-allowed}.btn-gray{background:var(--panel2);color:var(--text);border:1px solid var(--border)}#chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{padding:5px 9px;border:1px solid var(--border);background:var(--panel2);border-radius:999px;font-size:11px}.chip.done{color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,var(--border))}.chip.wait{color:var(--blue)}#debug{display:none}.section-head{display:flex;justify-content:space-between;align-items:end;margin:25px 0 10px}.section-head h2{font-size:16px;margin:0}.section-head p{font-size:12px;color:var(--muted);margin:4px 0 0}.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.fact{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:12px}.fact span{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:6px}.fact strong{font-size:13px;word-break:break-word}.fact strong.good{color:var(--green)}.fact strong.bad{color:var(--red)}.result-tools{display:flex;gap:10px;align-items:center;margin:24px 0 12px;flex-wrap:wrap}.hidden{display:none!important}.search{flex:1;min-width:230px;background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:10px 12px;color:var(--text);outline:none}.filters{display:flex;gap:6px;flex-wrap:wrap}.filter{border:1px solid var(--border);background:var(--panel);color:var(--muted);border-radius:999px;padding:8px 11px;font-size:11px;cursor:pointer}.filter.active{background:var(--blue2);color:var(--blue);border-color:#8eb5ff}.overview{display:grid;grid-template-columns:1.1fr 1.7fr;gap:12px;margin-bottom:15px}.score-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px}.score-card b{font-size:14px}.score-card p{font-size:11px;color:var(--muted);margin:4px 0 0}.score-ring{width:64px;height:64px;border-radius:50%;display:grid;place-content:center;text-align:center;border:6px solid var(--green);background:var(--greenbg)}.score-ring span{font-size:21px;font-weight:800;line-height:1}.score-ring small{font-size:9px;color:var(--muted)}.attention .score-ring{border-color:var(--amber);background:var(--amberbg)}.unhealthy .score-ring{border-color:var(--red);background:var(--redbg)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px;display:flex;align-items:center;gap:9px}.stat-dot{width:9px;height:9px;border-radius:50%;background:#94a3b8}.stat-dot.critical{background:var(--red)}.stat-dot.warning{background:var(--amber)}.stat-dot.info{background:var(--blue)}.stat-dot.files{background:#7c6df0}.stat-n{font-size:20px;font-weight:800}.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.finding-count{font-size:11px;color:var(--muted);margin:9px 2px}.card{background:var(--panel);border:1px solid var(--border);border-left:5px solid #9aa7ba;border-radius:14px;padding:17px;margin:10px 0;box-shadow:0 4px 18px rgba(16,24,40,.035)}.card.critical{border-left-color:var(--red)}.card.warning{border-left-color:var(--amber)}.card.info{border-left-color:var(--blue)}.card.ok{border-left-color:var(--green)}.card-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.bdg{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:4px 8px;border-radius:999px}.bdg.critical{background:var(--redbg);color:var(--red)}.bdg.warning{background:var(--amberbg);color:var(--amber)}.bdg.info{background:var(--blue2);color:var(--blue)}.bdg.ok{background:var(--greenbg);color:var(--green)}.source{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ctitle{font-size:15px;margin:11px 0 6px}.cwhat{line-height:1.55;color:var(--muted)}.evidence{margin:13px 0}.evidence summary{cursor:pointer;font-weight:650;font-size:11px;color:var(--blue)}.evidence pre,.cfix-txt{white-space:pre-wrap;word-break:break-word;margin:7px 0 0;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:10px;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text)}.cfix{margin-top:13px}.cfix-lbl{font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:800;letter-spacing:.06em}.empty{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:35px;text-align:center;color:var(--muted)}.empty h3{color:var(--text)}.empty-icon{width:48px;height:48px;margin:auto;border-radius:50%;display:grid;place-items:center;background:var(--greenbg);color:var(--green);font-size:25px}.footer{color:var(--muted);font-size:10px;text-align:center;padding:30px 0 12px}@media(max-width:850px){.hero,.overview{grid-template-columns:1fr}.facts{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.shell{padding:14px}.facts,.stats{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start}.theme{font-size:11px}.result-tools{align-items:stretch}.filters{width:100%}}
+</style></head><body><main class="shell">
+<header class="topbar"><div class="brand"><div class="logo">⌁</div><div><h1>Intune Diagnostics Studio</h1><p class="sub">Quick local checks for Intune, Entra ID, MDM and IME logs</p></div></div><button class="theme" id="themebtn">☾ Dark</button></header>
+<section class="hero"><div id="drop" class="panel"><div class="drop-icon">⇧</div><p>Drop your log files here</p><small>or click to browse · .log, .txt, .csv, .json, .xml</small></div><aside class="panel privacy"><h3>Runs locally</h3><p>The files are read in your browser. Nothing gets sent anywhere.</p><div class="privacy-row"><span class="tick">✓</span> Works on Windows, macOS and Linux</div><div class="privacy-row"><span class="tick">✓</span> No install needed to read logs</div><div class="privacy-row"><span class="tick">✓</span> Can be used offline</div></aside></section>
+<input type="file" id="fi" multiple accept=".log,.txt,.csv,.json,.xml" style="display:none">
+<section class="panel load-panel"><div class="load-head"><div><b>Input files</b><div id="statusbar" class="status">No files loaded</div></div><div class="actions"><button class="btn btn-blue" id="gobtn" disabled>Analyse logs</button><button class="btn btn-gray" id="clrbtn" style="display:none">Clear</button></div></div><div id="chips"></div></section>
+<div id="debug">Ready.</div>
+<section id="devicefacts"></section>
+<div id="resulttools" class="result-tools hidden"><input id="search" class="search" type="search" placeholder="Search findings, errors or fixes…"><div id="filters" class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="critical">Critical</button><button class="filter" data-filter="warning">Warnings</button><button class="filter" data-filter="info">Info</button><button class="filter" data-filter="ok">OK</button></div><button id="exportbtn" class="btn btn-gray">Export report</button></div>
+<section id="out"></section>
+<div class="footer">Intune Diagnostics Studio · Zahin Memon · runs locally · always check the evidence before making changes</div>
+</main><script>
+(function() {
+  var store   = {};   // filename -> { text: string|null, done: bool }
+  var pending = 0;
+  var dropEl  = document.getElementById('drop');
+  var fi      = document.getElementById('fi');
+  var chipsEl = document.getElementById('chips');
+  var statEl  = document.getElementById('statusbar');
+  var goBtn   = document.getElementById('gobtn');
+  var clrBtn  = document.getElementById('clrbtn');
+  var dbgEl   = document.getElementById('debug');
+  var outEl   = document.getElementById('out');
+  var searchEl = document.getElementById('search');
+  var filtersEl = document.getElementById('filters');
+  var exportBtn = document.getElementById('exportbtn');
+  var themeBtn = document.getElementById('themebtn');
+  var lastIssues = [];
+  var lastNames = [];
+  var activeFilter = 'all';
+  function log(m) {
+    dbgEl.textContent += m + '\n';
+    dbgEl.scrollTop = dbgEl.scrollHeight;
+  }
+  log('Elements found: drop=' + !!dropEl + ' gobtn=' + !!goBtn + ' fi=' + !!fi);
+  dropEl.addEventListener('dragover',  function(e) { e.preventDefault(); dropEl.classList.add('drag'); });
+  dropEl.addEventListener('dragleave', function()  { dropEl.classList.remove('drag'); });
+  dropEl.addEventListener('drop',      function(e) { e.preventDefault(); dropEl.classList.remove('drag'); ingest(e.dataTransfer.files); });
+  dropEl.addEventListener('click',     function()  { fi.click(); });
+  fi.addEventListener('change',        function(e) { ingest(e.target.files); fi.value = ''; });
+
+  goBtn.addEventListener('click', function() {
+    log('>>> Analyse button clicked');
+    run();
+  });
+
+  clrBtn.addEventListener('click', function() {
+    Object.keys(store).forEach(function(k) { delete store[k]; });
+    pending = 0;
+    chipsEl.innerHTML = '';
+    statEl.textContent = 'No files loaded';
+    goBtn.disabled = true;
+    clrBtn.style.display = 'none';
+    outEl.innerHTML = '';
+    document.getElementById('devicefacts').innerHTML = '';
+    document.getElementById('resulttools').classList.add('hidden');
+    lastIssues = []; lastNames = [];
+    dbgEl.textContent = 'Cleared. Drop new files to begin.\n';
+  });
+  function ingest(flist) {
+    var arr = [];
+    for (var i = 0; i < flist.length; i++) {
+      if (/\.(log|txt|csv|json|xml)$/i.test(flist[i].name)) arr.push(flist[i]);
+    }
+    log('Files dropped: ' + flist.length + ', accepted supported files: ' + arr.length);
+    if (!arr.length) return;
+
+    arr.forEach(function(f) {
+      var name = f.name;
+      if (store[name] && store[name].done) { log('Already loaded: ' + name); return; }
+      store[name] = { text: null, done: false };
+      pending++;
+      repaint();
+
+      var r = new FileReader();
+      r.onload = function(ev) {
+        var t = ev.target.result;
+        if (t && t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
+        store[name] = { text: t, done: true };
+        pending--;
+        log('Loaded: ' + name + ' (' + t.length + ' chars)');
+        repaint();
+      };
+      r.onerror = function() {
+        log('ERROR reading: ' + name);
+        delete store[name];
+        pending--;
+        repaint();
+      };
+      r.readAsText(f);
+    });
+  }
+
+  function repaint() {
+    var names = Object.keys(store);
+    var total = names.length;
+    var done  = names.filter(function(n) { return store[n].done; }).length;
+
+    chipsEl.innerHTML = '';
+    names.forEach(function(n) {
+      var c = document.createElement('span');
+      c.className = 'chip ' + (store[n].done ? 'done' : 'wait');
+      c.textContent = (store[n].done ? '✓ ' : '⏳ ') + n;
+      chipsEl.appendChild(c);
+    });
+
+    if (total === 0) {
+      statEl.textContent = 'No files loaded';
+      goBtn.disabled = true;
+      clrBtn.style.display = 'none';
+    } else if (pending > 0) {
+      statEl.textContent = '⏳ Loading… ' + done + ' / ' + total + ' ready';
+      goBtn.disabled = true;
+      clrBtn.style.display = '';
+    } else {
+      statEl.textContent = '✅ ' + total + ' file' + (total > 1 ? 's' : '') + ' ready — click Analyse logs';
+      goBtn.disabled = false;
+      clrBtn.style.display = '';
+    }
+  }
+  if (themeBtn) themeBtn.addEventListener('click', function() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('intune-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    themeBtn.textContent = document.documentElement.classList.contains('dark') ? '☀ Light' : '☾ Dark';
+  });
+  if (localStorage.getItem('intune-theme') === 'dark' || (!localStorage.getItem('intune-theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    if (themeBtn) themeBtn.textContent = '☀ Light';
+  }
+  if (searchEl) searchEl.addEventListener('input', function(){ render(lastIssues, lastNames, true); });
+  if (filtersEl) filtersEl.addEventListener('click', function(e){
+    var b = e.target.closest('[data-filter]'); if(!b) return;
+    activeFilter = b.getAttribute('data-filter');
+    Array.prototype.forEach.call(filtersEl.querySelectorAll('[data-filter]'), function(x){ x.classList.toggle('active', x === b); });
+    render(lastIssues, lastNames, true);
+  });
+  if (exportBtn) exportBtn.addEventListener('click', exportReport);
+
+  function collectDeviceFacts() {
+    var blob = Object.keys(store).map(function(n){ return '\n### ' + n + '\n' + (store[n].text || ''); }).join('\n');
+    function grab(label, re) { var m = blob.match(re); return m ? {label:label, value:(m[1]||'').trim()} : null; }
+    var facts = [
+      grab('Azure AD joined', /AzureAdJoined\s*:\s*([^\r\n]+)/i),
+      grab('Domain joined', /DomainJoined\s*:\s*([^\r\n]+)/i),
+      grab('Device auth', /DeviceAuthStatus\s*:\s*([^\r\n]+)/i),
+      grab('Tenant', /TenantName\s*:\s*([^\r\n]+)/i),
+      grab('Device ID', /DeviceId\s*:\s*([^\r\n]+)/i),
+      grab('Workplace joined', /WorkplaceJoined\s*:\s*([^\r\n]+)/i),
+      grab('Azure PRT', /AzureAdPrt\s*:\s*([^\r\n]+)/i),
+      grab('MDM URL', /MdmUrl\s*:\s*([^\r\n]+)/i)
+    ].filter(Boolean);
+    return facts;
+  }
+
+  function renderDeviceFacts() {
+    var el = document.getElementById('devicefacts'); if(!el) return;
+    var facts = collectDeviceFacts();
+    if(!facts.length) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="section-head"><div><h2>Device snapshot</h2><p>Pulled from the files you loaded</p></div></div><div class="facts">' + facts.map(function(f){
+      var v=f.value, cls=/^(yes|success)$/i.test(v)?'good':/^(no|failed|error)$/i.test(v)?'bad':'';
+      return '<div class="fact"><span>'+x(f.label)+'</span><strong class="'+cls+'">'+x(v)+'</strong></div>';
+    }).join('') + '</div>';
+  }
+
+  function exportReport() {
+    if(!lastNames.length) return;
+    var crit=lastIssues.filter(function(i){return i.sev==='critical';}).length;
+    var warn=lastIssues.filter(function(i){return i.sev==='warning';}).length;
+    var html='<!doctype html><html><head><meta charset="utf-8"><title>Intune analysis report</title><style>body{font-family:Arial,sans-serif;max-width:980px;margin:40px auto;padding:0 20px;color:#172033}h1{margin-bottom:4px}.meta{color:#64748b}.issue{border:1px solid #e2e8f0;border-left:5px solid #64748b;border-radius:10px;padding:16px;margin:14px 0}.critical{border-left-color:#ef4444}.warning{border-left-color:#f59e0b}.info{border-left-color:#3b82f6}.ok{border-left-color:#22c55e}pre{white-space:pre-wrap;background:#f8fafc;padding:10px;border-radius:8px}</style></head><body>'+
+      '<h1>Intune Log Analysis</h1><div class="meta">Files: '+lastNames.length+' | Critical: '+crit+' | Warnings: '+warn+' | Report created: '+new Date().toLocaleString()+'</div>'+
+      lastIssues.map(function(i){return '<div class="issue '+i.sev+'"><h3>'+x(i.title)+'</h3><p><b>Source:</b> '+x(i.src)+'</p><p>'+x(i.what)+'</p>'+(i.ev&&i.ev.length?'<pre>'+x(i.ev.join('\n'))+'</pre>':'')+'<p><b>What to check</b></p><pre>'+x(i.fix)+'</pre></div>';}).join('')+'</body></html>';
+    var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='Intune-Analysis-Report-'+new Date().toISOString().slice(0,10)+'.html'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  }
+  function parseLog(text, filename) {
+    if (filename && /\.csv$/i.test(filename) && /TimeCreated|EventId/i.test(text.split('\n')[0] || '')) {
+      return parseEventCsv(text);
+    }
+    if (text.indexOf('[LOG[') >= 0 && text.indexOf(']LOG]!>') >= 0) {
+      var lines = [];
+      var parts = text.split('<![LOG[');
+      for (var i = 1; i < parts.length; i++) {
+        var p   = parts[i];
+        var end = p.indexOf(']LOG]!>');
+        if (end < 0) continue;
+        var msg  = p.substring(0, end).trim();
+        var meta = p.substring(end + 7);
+        var tsM  = meta.match(/time="([^"]+)"[^>]*date="([^"]+)"/);
+        var ts   = tsM ? tsM[2] + ' ' + tsM[1] : '';
+        var cM   = meta.match(/component="([^"]+)"/);
+        var comp = cM ? cM[1] : '';
+        var tM   = meta.match(/type="?(\d)"?/);
+        var t    = tM ? parseInt(tM[1], 10) : 1;
+        var lvl  = t === 3 ? 'ERR' : t === 2 ? 'WARN' : 'INFO';
+        lines.push({ ts: ts, msg: msg, comp: comp, lvl: lvl });
+      }
+      return lines;
+    }
+    return text.split(/\r?\n/).filter(function(l) { return l.trim(); }).map(function(raw) {
+      var lvl = 'INFO';
+      if (/\b(error|fail|exception|critical)\b/i.test(raw)) lvl = 'ERR';
+      else if (/\b(warn|retry|timeout)\b/i.test(raw)) lvl = 'WARN';
+      return { ts: '', msg: raw, comp: '', lvl: lvl };
+    });
+  }
+  function parseEventCsv(text) {
+    var lines = [];
+    var rows = splitCsvRows(text);
+    if (!rows.length) return lines;
+
+    var header = rows[0].map(function(h) { return h.trim().toLowerCase(); });
+    var idxTime     = header.indexOf('timecreated');
+    var idxLevel    = header.indexOf('level');
+    var idxEventId  = header.indexOf('eventid');
+    var idxFriendly = header.indexOf('friendlymeaning');
+    var idxProvider = header.indexOf('providername');
+    var idxMessage  = header.indexOf('message');
+    var idxChannel  = header.indexOf('channel');
+
+    for (var r = 1; r < rows.length; r++) {
+      var row = rows[r];
+      if (!row || !row.length) continue;
+      var level = idxLevel >= 0 ? (row[idxLevel] || '') : '';
+      var lvl = 'INFO';
+      if (/error|critical/i.test(level)) lvl = 'ERR';
+      else if (/warn/i.test(level)) lvl = 'WARN';
+
+      var eventId  = idxEventId  >= 0 ? row[idxEventId]  : '';
+      var friendly = idxFriendly >= 0 ? row[idxFriendly] : '';
+      var provider = idxProvider >= 0 ? row[idxProvider] : '';
+      var channel  = idxChannel  >= 0 ? row[idxChannel]  : '';
+      var message  = idxMessage  >= 0 ? row[idxMessage]  : row.join(' ');
+      var ts       = idxTime     >= 0 ? row[idxTime]     : '';
+
+      var combinedMsg = (friendly ? '[' + friendly + '] ' : '')
+                       + (eventId ? 'EventID=' + eventId + ' ' : '')
+                       + (channel ? '[' + channel + '] ' : '')
+                       + message;
+
+      lines.push({ ts: ts, msg: combinedMsg, comp: provider, lvl: lvl, eventId: eventId });
+    }
+    return lines;
+  }
+  function splitCsvRows(text) {
+    var rows = [];
+    var row = [];
+    var field = '';
+    var inQuotes = false;
+    text = text.replace(/\r\n/g, '\n');
+
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else {
+        if (c === '"') { inQuotes = true; }
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+        else { field += c; }
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(function(r) { return r.length > 1 || (r.length === 1 && r[0].trim()); });
+  }
+  var RULES = [
+    { id: 'web_ex', sev: 'critical',
+      title: 'Network exception connecting to Intune service',
+      test: function(ls) { return ls.some(function(l) { return /Web Exception|WebException|non-retryable/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /Web Exception|WebException|non-retryable/i.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'The IME agent threw a network exception connecting to the Intune service. Apps and policies cannot sync until resolved.',
+      fix:  '1. Test-NetConnection enrollmentapi.manage.microsoft.com -Port 443\n2. Check proxy: netsh winhttp show proxy\n3. Ensure *.manage.microsoft.com is not blocked by firewall\n4. Restart-Service IntuneManagementExtension'
+    },
+    { id: 'null_ref', sev: 'critical',
+      title: 'NullReferenceException — service returned empty response',
+      test: function(ls) { return ls.some(function(l) { return /NullReferenceException/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /NullReferenceException/i.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'A NullReferenceException occurred when processing a response from Intune — typically caused by a failed or empty service response.',
+      fix:  '1. Check M365 service health: admin.microsoft.com → Health → Service health\n2. Restart-Service IntuneManagementExtension\n3. If persists, clear IME data:\n   Stop-Service IntuneManagementExtension\n   Remove-Item "C:\\ProgramData\\Microsoft\\IntuneManagementExtension\\Data" -Recurse -Force\n   Start-Service IntuneManagementExtension'
+    },
+    { id: 'hs_fail', sev: 'critical',
+      title: 'HealthScript failed to retrieve policy from Intune',
+      test: function(ls) { return ls.some(function(l) { return /Failed to get.*policy from service|Failed to get.*script policy/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /Failed to get.*policy from service|Failed to get.*script policy/i.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'The HealthScripts agent failed to retrieve remediation policies from the Intune service. Remediations will not run until resolved.',
+      fix:  '1. Test-NetConnection *.manage.microsoft.com -Port 443\n2. dsregcmd /status — verify AzureAdJoined = YES\n3. Restart-Service IntuneManagementExtension\n4. Intune portal → Devices → Remediations — verify scripts are assigned to this device'
+    },
+    { id: 'win32_fail', sev: 'critical',
+      title: 'Win32 app installation failure',
+      test: function(ls) { return ls.some(function(l) { return /\[Win32App\].*(install.*fail|failed.*install)|ExitCode.*(1603|1618|1619|259)/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /\[Win32App\].*(fail|error)|ExitCode/i.test(l.msg); }).slice(0,4).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'One or more Win32 apps failed to install. The installer returned a non-success exit code.',
+      fix:  '1. Intune portal → Apps → All apps → [app] → Device install status — note error code\n2. 1603 = fatal error, 1618 = another install in progress, 259 = detection mismatch\n3. Run install manually as SYSTEM: psexec -s cmd.exe\n4. Check logs: C:\\ProgramData\\Microsoft\\IntuneManagementExtension\\Logs\\'
+    },
+    { id: 'enf_null', sev: 'warning',
+      title: 'Required apps pending enforcement',
+      test: function(ls) { return ls.filter(function(l) { return /"EnforcementState":null/.test(l.msg) && /"Intent":3/.test(l.msg); }).length >= 2; },
+      ev:   function(ls) { return ls.filter(function(l) { return /"EnforcementState":null/.test(l.msg) && /"Intent":3/.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'Required apps (Intent=3) have null EnforcementState — Intune has not yet attempted installation.',
+      fix:  '1. Restart-Service IntuneManagementExtension\n2. Or: Intune portal → Devices → [device] → Sync\n3. Allow up to 8 hours for the next evaluation cycle'
+    },
+    { id: 'filter', sev: 'info',
+      title: 'Apps excluded by assignment filter (Applicability=1010)',
+      test: function(ls) { return ls.some(function(l) { return /AssginmentFilters.*1010|AppApplicabilityStateDue.*1010/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /AssginmentFilters.*1010|AppApplicabilityStateDue.*1010/.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'Apps show Applicability=1010 — excluded by assignment filter. This device does not match the filter criteria (e.g. not a Cloud PC). Expected behaviour.',
+      fix:  'If these apps should install here:\n1. Intune portal → Devices → Filters → review filter rules\n2. Adjust filter or add a direct group assignment without a filter'
+    },
+    { id: 'channel', sev: 'info',
+      title: 'WNS notification channel still valid — CMTrace false positive',
+      test: function(ls) { return ls.some(function(l) { return /not registering.*channel.*yet to expire|previous channel.*yet to expire/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /not registering.*channel|yet to expire/i.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'CMTrace shows this as red (type=3) but it is NOT an error. The WNS push channel is still valid. Completely normal.',
+      fix:  'Nothing to do here. You can ignore this entry.'
+    },
+    { id: 'queued', sev: 'info',
+      title: 'Queued remediation tasks expired and cleared',
+      test: function(ls) { return ls.some(function(l) { return /queued time.*is expired|clear the queue/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /queued time.*is expired|clear the queue/i.test(l.msg); }).slice(0,2).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'Queued remediation tasks that exceeded their time window were discarded. They will re-queue on next sync cycle. Usually benign.',
+      fix:  'Normally nothing to do. If it keeps happening:\n1. Ensure device is online during remediation schedule window\n2. Force sync: Settings → Accounts → Access work or school → Info → Sync'
+    },
+    { id: 'epm', sev: 'info',
+      title: 'Endpoint Privilege Management not licensed (expected noise)',
+      test: function(ls) { return ls.some(function(l) { return /PrivilegeManagement flag is not set/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /PrivilegeManagement flag is not set/i.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'EPM is not licensed. Appears on all devices without Intune Suite — completely normal noise, safe to ignore.',
+      fix:  'Nothing to do unless EPM is meant to be in use.\nIf needed: assign Intune Suite licence → Intune portal → Endpoint security → Endpoint Privilege Management'
+    },
+    { id: 'dhm', sev: 'info',
+      title: 'Device Health Monitoring not enabled (expected)',
+      test: function(ls) { return ls.some(function(l) { return /DHM is not enabled/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /DHM is not enabled/i.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'DHM is not enabled — expected unless a Device Health Monitoring configuration profile has been assigned.',
+      fix:  'Only check this if Device Health Monitoring is meant to be in use:\nIntune portal → Devices → Configuration profiles → Create → Windows 10+ → Templates → Device Health Monitoring'
+    },
+    { id: 'cert_ok', sev: 'ok',
+      title: 'MDM certificate found and loaded',
+      test: function(ls) { return ls.some(function(l) { return /Found \d+ MDM cert/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /Found \d+ MDM cert/i.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'MDM certificate is present and loaded. Authentication to Intune is working.',
+      fix:  'Nothing to do here.'
+    },
+    { id: 'prod_ok', sev: 'ok',
+      title: 'Connected to production Intune environment',
+      test: function(ls) { return ls.some(function(l) { return /current-enroll-env.*PE|enroll-env.*Prod/i.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return /current-enroll-env.*PE|enroll-env.*Prod/i.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,200);}); },
+      what: 'IME is enrolled in and communicating with the production Intune environment.',
+      fix:  'Nothing to do here.'
+    },
+    { id: 'evt_policy_set_fail', sev: 'critical',
+      title: 'Event Viewer: MDM policy failed to apply (Event ID 76)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '76' || /EventID=76\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '76' || /EventID=76\b/.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Windows logged Event ID 76 — the MDM Configuration Manager failed to set one or more policies on this device. The policy payload was rejected or could not be applied to the local system.',
+      fix:  '1. Open Event Viewer → Applications and Services Logs → Microsoft → Windows → DeviceManagement-Enterprise-Diagnostics-Provider → Admin\n2. Find the Event ID 76 entry and check which CSP (Configuration Service Provider) failed\n3. Common cause: conflicting GPO and Intune policy targeting the same setting — check Settings → Accounts → Access work or school → Info → "Create report" for MDM Diagnostic Report\n4. Restart-Service IntuneManagementExtension\n5. Force a sync: Settings → Accounts → Access work or school → Info → Sync'
+    },
+    { id: 'evt_policy_get_fail', sev: 'warning',
+      title: 'Event Viewer: Failed to retrieve policy from MDM service (Event ID 78)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '78' || /EventID=78\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '78' || /EventID=78\b/.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 78 indicates the device failed to retrieve policy from the MDM service during a sync session. This blocks new or updated policies from reaching the device.',
+      fix:  '1. Test connectivity: Test-NetConnection enrollmentapi.manage.microsoft.com -Port 443\n2. dsregcmd /status — confirm AzureAdJoined = YES and MDMEnrolled = YES\n3. Check Microsoft 365 service health at admin.microsoft.com\n4. Trigger a manual sync and watch for the same Event ID recurring'
+    },
+    { id: 'evt_enroll_fail', sev: 'critical',
+      title: 'Event Viewer: MDM enrollment failed (Event ID 102)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '102' || /EventID=102\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '102' || /EventID=102\b/.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 102 — the device failed to complete MDM enrollment. The device may show as partially enrolled or not managed at all in Intune.',
+      fix:  '1. Check enrollment status: dsregcmd /status\n2. Disconnect and re-enrol: Settings → Accounts → Access work or school → select account → Disconnect, then re-add\n3. Check Entra ID device limit hasn\'t been reached for the user\n4. Verify MDM auto-enrollment is configured: Intune portal → Devices → Enrollment → Automatic Enrollment\n5. Review the detailed error in Event Viewer for the specific failure reason code'
+    },
+    { id: 'evt_autoenroll_fail', sev: 'critical',
+      title: 'Event Viewer: Auto MDM enrollment failed (Event ID 8204)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '8204' || /EventID=8204\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '8204' || /EventID=8204\b/.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 8204 — Windows attempted to automatically enrol this device into MDM (typically triggered by Entra ID hybrid join or AzureAD Premium auto-enrollment policy) and the attempt failed.',
+      fix:  '1. Verify auto-enrollment GPO/CSP is correctly configured: Computer Configuration → Administrative Templates → Windows Components → MDM → Enable automatic MDM enrollment\n2. dsregcmd /status — confirm AzureAdJoined = YES first (auto-enrollment requires AAD join to succeed first)\n3. Check user has an Intune licence assigned in Entra ID\n4. Manually trigger: Start-Process "deviceenroller.exe" -ArgumentList "/c /AutoEnrollMDM" -Verb RunAs'
+    },
+    { id: 'evt_nonce_fail', sev: 'warning',
+      title: 'Event Viewer: Failed to get enrollment nonce (Event ID 8202)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '8202' || /EventID=8202\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '8202' || /EventID=8202\b/.test(l.msg); }).slice(0,2).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 8202 — the device could not retrieve a security nonce required to complete the MDM enrollment handshake, usually due to a transient connectivity issue with Azure AD.',
+      fix:  '1. Often transient — retry by forcing a sync or device restart\n2. Test-NetConnection login.microsoftonline.com -Port 443\n3. Check for clock skew — enrollment can fail if the device clock is off by more than a few minutes\n4. If persistent, see Event ID 8204 fix steps for a full auto-enrollment reset'
+    },
+    { id: 'evt_already_enrolled', sev: 'ok',
+      title: 'Event Viewer: Device already enrolled (informational)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '8211' || /EventID=8211\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '8211' || /EventID=8211\b/.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 8211 confirms the device is already MDM-enrolled — Windows skipped a redundant auto-enrollment attempt. This is expected and healthy.',
+      fix:  'Nothing to do here.'
+    },
+    { id: 'evt_autoenroll_ok', sev: 'ok',
+      title: 'Event Viewer: Auto MDM enrollment succeeded (Event ID 8300)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '8300' || /EventID=8300\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '8300' || /EventID=8300\b/.test(l.msg); }).slice(0,1).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'Event ID 8300 confirms automatic MDM enrollment completed successfully.',
+      fix:  'Nothing to do here.'
+    },
+    { id: 'evt_sync_404', sev: 'critical',
+      title: 'Event Viewer: MDM sync endpoint not found — HTTP 404 (Event ID 404)',
+      test: function(ls) { return ls.some(function(l) { return l.eventId === '404' || /EventID=404\b/.test(l.msg); }); },
+      ev:   function(ls) { return ls.filter(function(l) { return l.eventId === '404' || /EventID=404\b/.test(l.msg); }).slice(0,3).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'The device received an HTTP 404 when attempting to sync with the MDM service — the enrollment endpoint could not be found. This usually means the device enrollment record is stale or was deleted server-side.',
+      fix:  '1. Check if the device still exists in Intune portal → Devices → All devices\n2. If missing/deleted: unenrol locally and re-enrol\n   Settings → Accounts → Access work or school → Disconnect, then re-add\n3. dsregcmd /leave then dsregcmd /join if AAD join is also broken\n4. Check Intune portal → Devices → Audit logs for a recent device deletion event'
+    },
+    { id: 'evt_generic_error', sev: 'warning',
+      title: 'Event Viewer: Error-level MDM events present',
+      test: function(ls) { return ls.filter(function(l) { return l.lvl === 'ERR' && l.eventId; }).length >= 1; },
+      ev:   function(ls) { return ls.filter(function(l) { return l.lvl === 'ERR' && l.eventId; }).slice(0,4).map(function(l){return l.msg.substring(0,220);}); },
+      what: 'One or more Error-level events were logged in the MDM/Intune Event Viewer channels that don\'t match a specific known Event ID pattern above. Worth reviewing manually.',
+      fix:  '1. Open Event Viewer → Applications and Services Logs → Microsoft → Windows → DeviceManagement-Enterprise-Diagnostics-Provider\n2. Search the specific Event ID shown in the evidence above against Microsoft Learn for documentation\n3. Cross-reference the timestamp against IME log activity for related app/script failures at the same time'
+    }
+  ];
+  function run() {
+    var names = Object.keys(store);
+    log('Files in store: ' + names.length);
+    names.forEach(function(n) { log('  ' + n + ': done=' + store[n].done + ' textLen=' + (store[n].text ? store[n].text.length : 'null')); });
+
+    if (!names.length) { log('No files — aborting'); return; }
+
+    var notDone = names.filter(function(n) { return !store[n].done; });
+    if (notDone.length) { log('Not ready: ' + notDone.join(', ')); return; }
+
+    goBtn.disabled = true;
+    goBtn.textContent = '⏳ Analysing…';
+    setTimeout(function() {
+      try {
+        var issues = [];
+        var seen   = {};
+
+        names.forEach(function(filename) {
+          var text  = store[filename].text;
+          var lines = parseLog(text, filename);
+          var errs  = lines.filter(function(l) { return l.lvl === 'ERR';  }).length;
+          var warns = lines.filter(function(l) { return l.lvl === 'WARN'; }).length;
+          log('Parsed ' + filename + ': ' + lines.length + ' lines, ERR=' + errs + ', WARN=' + warns);
+
+          RULES.forEach(function(rule) {
+            if (seen[rule.id]) return;
+            try {
+              if (rule.test(lines)) {
+                seen[rule.id] = true;
+                var ev = rule.ev(lines);
+                issues.push({ id: rule.id, sev: rule.sev, title: rule.title, src: filename, what: rule.what, ev: ev, fix: rule.fix });
+                log('  Rule fired: ' + rule.id);
+              }
+            } catch(re) { log('  Rule error [' + rule.id + ']: ' + re.message); }
+          });
+        });
+
+        log('Issues found: ' + issues.length);
+        lastIssues = issues.slice(); lastNames = names.slice();
+        renderDeviceFacts();
+        document.getElementById('resulttools').classList.remove('hidden');
+        render(issues, names);
+      } catch(e) {
+        log('ANALYSIS ERROR: ' + e.message + '\n' + e.stack);
+      }
+
+      goBtn.disabled = false;
+      goBtn.textContent = '🔍 Analyse logs';
+    }, 50);
+  }
+  function render(issues, names, preserveScroll) {
+    issues = issues || [];
+    names = names || [];
+    var order = { critical: 0, warning: 1, info: 2, ok: 3 };
+    issues = issues.slice().sort(function(a, b) { return (order[a.sev] || 2) - (order[b.sev] || 2); });
+
+    var crit = issues.filter(function(i) { return i.sev === 'critical'; }).length;
+    var warn = issues.filter(function(i) { return i.sev === 'warning';  }).length;
+    var info = issues.filter(function(i) { return i.sev === 'info'; }).length;
+    var ok   = issues.filter(function(i) { return i.sev === 'ok'; }).length;
+    var score = Math.max(0, 100 - crit * 25 - warn * 10);
+    var scoreClass = score >= 80 ? 'healthy' : score >= 55 ? 'attention' : 'unhealthy';
+
+    var q = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    var visible = issues.filter(function(i){
+      if(activeFilter !== 'all' && i.sev !== activeFilter) return false;
+      if(!q) return true;
+      return (i.title+' '+i.src+' '+i.what+' '+i.fix+' '+(i.ev||[]).join(' ')).toLowerCase().indexOf(q) >= 0;
+    });
+
+    var h = '<div class="overview">'
+      + '<div class="score-card '+scoreClass+'"><div class="score-ring"><span>'+score+'</span><small>/100</small></div><div><b>'+ (score>=80?'Healthy overall':score>=55?'Needs attention':'Action required') +'</b><p>Heuristic based on detected critical and warning findings</p></div></div>'
+      + '<div class="stats">'
+      + stat(names.length, 'files', 'Files')
+      + stat(crit, 'critical', 'Critical')
+      + stat(warn, 'warning', 'Warnings')
+      + stat(info + ok, 'info', 'Info / OK')
+      + '</div></div>';
+
+    if (!issues.length) {
+      h += '<div class="empty"><div class="empty-icon">✓</div><h3>No known issues detected</h3><p>The supplied files did not match any current detection rule.</p></div>';
+    } else if (!visible.length) {
+      h += '<div class="empty"><h3>No matching findings</h3><p>Try another severity filter or search term.</p></div>';
+    } else {
+      h += '<div class="finding-count">Showing '+visible.length+' of '+issues.length+' findings</div>';
+      visible.forEach(function(iss) {
+        var evHtml = '';
+        if (iss.ev && iss.ev.length) evHtml = '<details class="evidence"><summary>Evidence ('+iss.ev.length+')</summary><pre>' + x(iss.ev.join('\n')) + '</pre></details>';
+        h += '<article class="card ' + iss.sev + '">'
+          + '<div class="card-top"><span class="bdg ' + iss.sev + '">' + iss.sev + '</span><span class="source">' + x(iss.src) + '</span></div>'
+          + '<h3 class="ctitle">' + x(iss.title) + '</h3>'
+          + '<div class="cwhat">' + x(iss.what) + '</div>'
+          + evHtml
+          + '<div class="cfix"><div class="cfix-lbl">What to check</div><pre class="cfix-txt">' + x(iss.fix) + '</pre></div>'
+          + '</article>';
+      });
+    }
+
+    outEl.innerHTML = h;
+    if(!preserveScroll) outEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function stat(n, cls, label) {
+    return '<div class="stat"><div class="stat-dot '+cls+'"></div><div><div class="stat-n">'+n+'</div><div class="stat-label">'+label+'</div></div></div>';
+  }
+
+  function x(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+})(); // end IIFE
+</script></body></html>
